@@ -20,15 +20,29 @@ function mouseDownHandler(e) {
 	};
 
 	let pos = getMousePos(canvas, e); // Gets mouse position
-
-	if (pos.x > 20 && pos.y > 10 && pos.x < 100 && pos.y < 110) {
-		// If start button is clicked, make curve
-		BPoints = makeCurve();
+	if (e.which === 1) {
+		if (pos.x > 20 && pos.y > 10 && pos.x < 100 && pos.y < 110) {
+			// If start button is clicked, make curve
+			BPoints = makeCurve();
+		} else {
+			// Else, adds mouse pos as a point
+			points.push({x:pos.x, y:pos.y});
+		}
 	} else {
-		// Else, adds mouse pos as a point
-		points.push({x:pos.x, y:pos.y});
+		for (let i = 0; i < points.length; i++) {
+			if (pointInCircle(pos, points[i], 5)) {
+				points.splice(i, 1)
+				break
+			}
+		}
 	}
-	
+}
+
+
+
+// Checks if a point is in a circle
+function pointInCircle(p1, p2, r) {
+	return ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) <= r * r); // Distance formula squared (so it's faster)
 }
 
 
@@ -144,6 +158,8 @@ function makeCurve() {
 function main () {
 	// Main loop
     function gameLoop () {
+		ctx.canvas.width  = window.innerWidth;
+		ctx.canvas.height = window.innerHeight;
 		draw();
 
 		window.requestAnimationFrame(gameLoop, canvas); // Loops it
