@@ -137,6 +137,7 @@ function draw() {
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = 'black';
 		ctx.stroke();
+		drawLine(BPoints[i].x, BPoints[i].y, BPoints[i+1].x, BPoints[i+1].y);
 	}
 }
 
@@ -178,9 +179,11 @@ function getPoint(t, sPoints) {
 // Makes the Bezier Curve
 function makeCurve() {
 	somePoints = []; // idk
-
+	if (points.length === 0) {
+		return [];
+	}
 	// Gets all points for t and stores in somePoints
-	for (let t = 0; t < 1; t += 0.001) {
+	for (let t = 0; t < 1; t += 0.0005) {
 		somePoints.push(getPoint(t, points))
 	}
 	return somePoints;
