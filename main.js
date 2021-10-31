@@ -6,6 +6,7 @@ ctx.canvas.height = window.innerHeight;
 var points = [];
 ctx.fillStyle = '#add8e6';
 ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+var showDetail = false;
 
 
 function makePoint(e) {
@@ -22,7 +23,7 @@ function makePoint(e) {
 	if (pos.x > 20 && pos.y > 10 && pos.x < 100 && pos.y < 110) {
 		makeCurve();
 	} else {
-		points.push([pos.x, pos.y]); // adds it to points
+		points.push({x:pos.x, y:pos.y}); // adds it to points
 	}
 	
 }
@@ -71,39 +72,45 @@ function draw() {
 	ctx.stroke();
 
 	for (let i = 0; i < points.length; i++) {
-		drawPoint(points[i][0], points[i][1]);
+		drawPoint(points[i].x, points[i].y);
 	}
 
 	for (let i = 0; i < points.length - 1; i++) {
-		drawLine(points[i][0], points[i][1], points[i+1][0], points[i+1][1]);
+		drawLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
 	}
 }
 
 
-function getPoints(x0, y0, x1, y1) {
-	let subPoints = []
-	for (let t = 0; t <= 1; t+= 0.01) {
-		ctx.beginPath();
-		let x = (1-t) * x0 + t * x1;
-		let y = (1-t) * y0 + t * y1;
-		subPoints.push([x, y]);
+function getPoint(t, sPoints) {
+	let subPoints = [];
+	if (sPoints.length > 1) {
+		for (let i = 0; i < sPoints.length - 1; i++) {
+			let x = sPoints[i].x + t * (sPoints[i + 1].x - sPoints[i].x);
+			let y = sPoints[i].y + t * (sPoints[i + 1].y - sPoints[i].y);
+
+			subPoints.push({x: x, y: y});
+		}
+
+		return getPoint(t, subPoints);
+	} else {
+		return sPoints[0];
 	}
-	return subPoints;
+
 }
 
 
 function makeCurve() {
-	let allPoints = [];
-	for (let i = 0; i < points.length - 1; i++) {
-		allPoints.push(getPoints(points[0+i][0], points[0+i][1], points[1+i][0], points[1+i][1]));
-		for (let j = 0; j < allPoints[i].length; j++) {
-			ctx.arc(allPoints[i][j][0], allPoints[i][j][1], 1, 0, 2 * Math.PI, false);
-			ctx.fillStyle = 'black';
-			ctx.fill();
-			ctx.lineWidth = 3;
-			ctx.strokeStyle = 'black';
-			ctx.stroke();
-		}
+	let BPoints = [];
+	for (let t = 0; t < 1; t += 0.001) {
+		BPoints.push(getPoint(t, points))
+	}
+
+	for (let i = 0; i < BPoints.length; i++) {
+		ctx.beginPath();
+		ctx.arc(BPoints[i].x, BPoints[i].y, 1, 0, 2 * Math.PI, false);
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = 'black';
+		ctx.stroke();
 	}
 }
 
