@@ -25,7 +25,8 @@ function mouseDownHandler(e) {
 	if (e.which === 1) {
 		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 90 && pos.y <= 20) {
 			// If start button is clicked, make curve
-			BPoints = makeCurve();
+			showCurve = !showCurve;
+			BPoints = [];
 		} else {
 			let mouseOnPoint = false;
 			for (let i = 0; i < points.length; i++) {
@@ -140,6 +141,14 @@ function draw() {
 }
 
 
+// Updates everything else
+function update() {
+	if (showCurve) {
+		BPoints = makeCurve();
+	}
+}
+
+
 // Recursive function to get bezier curve points
 function getPoint(t, sPoints) {
 	let subPoints = [];
@@ -184,6 +193,7 @@ function main () {
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight;
 		draw();
+		update();
 
 		window.requestAnimationFrame(gameLoop, canvas); // Loops it
         
