@@ -6,39 +6,68 @@ ctx.canvas.height = window.innerHeight;
 var points = []; // User created points
 var showCurve = false; // Bezier-Curve toggle (TODO)
 var BPoints = []; // Points in Bezier Curve
+var selectedPoint = null;
+
+
+// Function to get mouse position
+function getMousePos(canvas, evt) {
+	var rect = canvas.getBoundingClientRect();
+	return {
+		x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+		y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+	};
+};
 
 
 // Handles mouseDown
 function mouseDownHandler(e) {
-	// Function to get mouse position
-	let getMousePos = function (canvas, evt) {
-        var rect = canvas.getBoundingClientRect();
-        return {
-            x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
-            y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
-        };
-	};
-
 	let pos = getMousePos(canvas, e); // Gets mouse position
 	if (e.which === 1) {
-		if (pos.x > 20 && pos.y > 10 && pos.x < 100 && pos.y < 110) {
+		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 90 && pos.y <= 20) {
 			// If start button is clicked, make curve
 			BPoints = makeCurve();
 		} else {
+			let mouseOnPoint = false;
+			for (let i = 0; i < points.length; i++) {
+				if (pointInCircle(pos, points[i], 5)) {
+					selectedPoint = points[i];
+					mouseOnPoint = true;
+					break;
+				}
+			}
 			// Else, adds mouse pos as a point
-			points.push({x:pos.x, y:pos.y});
+			if (!mouseOnPoint) {
+				points.push({x: pos.x, y: pos.y});
+			}
+
 		}
 	} else {
 		for (let i = 0; i < points.length; i++) {
 			if (pointInCircle(pos, points[i], 5)) {
-				points.splice(i, 1)
-				break
+				points.splice(i, 1);
+				break;
 			}
 		}
 	}
 }
 
 
+// Unselect point if mouse is up
+function mouseUpHandler(e) {
+	selectedPoint = null;
+}
+
+
+// if point selected, move with mouse
+function mouseMoveHandler(e) {
+	if (selectedPoint !== null) {
+		let pos = getMousePos(canvas, e);
+		let index = points.indexOf(selectedPoint);
+		let newPoint = {x: pos.x, y: pos.y};
+		points[index] = newPoint;
+		selectedPoint = newPoint;
+	}
+}
 
 // Checks if a point is in a circle
 function pointInCircle(p1, p2, r) {
@@ -76,25 +105,19 @@ function draw() {
 	ctx.fillStyle = '#add8e6';
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-	// Start Button
+	// Start Button Box
 	ctx.beginPath();
-	ctx.rect(20, 10, 80, 100);
+	ctx.rect(5, 5, 90, 20);
 	ctx.fillStyle = "#BF565A";
 	ctx.fill();
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = 'black';
 	ctx.stroke();
 
-	// Start Button Box
-	ctx.beginPath();
-	ctx.moveTo(40, 20);
-	ctx.lineTo(90, 55);
-	ctx.lineTo(40, 95);
-	ctx.lineTo(40, 20);
-	ctx.fillStyle = '#800000';
-	ctx.fill();
-	ctx.strokeStyle = 'black';
-	ctx.stroke();
+	// Start Button Text
+	ctx.font = '15px serif';
+	ctx.fillStyle = "white";
+	ctx.fillText('Toggle Curve', 10, 20);
 
 	// Draws User Points
 	for (let i = 0; i < points.length; i++) {
@@ -170,4 +193,6 @@ function main () {
 }
 
 window.addEventListener("mousedown", mouseDownHandler, false); 
+window.addEventListener("mouseup", mouseUpHandler, false);
+window.addEventListener("mousemove", mouseMoveHandler, false);
 main();
