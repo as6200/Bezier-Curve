@@ -27,6 +27,9 @@ function mouseDownHandler(e) {
 			// If start button is clicked, make curve
 			showCurve = !showCurve;
 			BPoints = [];
+		} else if (pos.x >= 105 && pos.y >= 5 && pos.x <= 150 && pos.y <= 25) {
+			// If clear button is clicked, clear points
+			points = [];
 		} else {
 			let mouseOnPoint = false;
 			for (let i = 0; i < points.length; i++) {
@@ -119,6 +122,20 @@ function draw() {
 	ctx.font = '15px serif';
 	ctx.fillStyle = "white";
 	ctx.fillText('Toggle Curve', 10, 20);
+
+	// Clear Button Box
+	ctx.beginPath();
+	ctx.rect(105, 5, 45, 20);
+	ctx.fillStyle = "#BF565A";
+	ctx.fill();
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = 'black';
+	ctx.stroke();
+
+	// Clear Button Text
+	ctx.font = '15px serif';
+	ctx.fillStyle = "white";
+	ctx.fillText('Clear', 110, 20);
 
 	// Draws User Points
 	for (let i = 0; i < points.length; i++) {
