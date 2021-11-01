@@ -23,7 +23,7 @@ function getMousePos(canvas, evt) {
 function mouseDownHandler(e) {
 	let pos = getMousePos(canvas, e); // Gets mouse position
 	if (e.which === 1) {
-		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 90 && pos.y <= 20) {
+		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 95 && pos.y <= 25) {
 			// If start button is clicked, make curve
 			showCurve = !showCurve;
 			BPoints = [];
@@ -72,7 +72,7 @@ function mouseMoveHandler(e) {
 
 // Checks if a point is in a circle
 function pointInCircle(p1, p2, r) {
-	return ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) <= r * r); // Distance formula squared (so it's faster)
+	return ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) <= r * r + r); // Distance formula squared (so it's faster) with some extra room
 }
 
 
