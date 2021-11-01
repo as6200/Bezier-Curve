@@ -23,10 +23,12 @@ function getMousePos(canvas, evt) {
 function mouseDownHandler(e) {
 	let pos = getMousePos(canvas, e); // Gets mouse position
 	if (e.which === 1) {
-		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 90 && pos.y <= 20) {
+		if (pos.x >= 5 && pos.y >= 5 && pos.x <= 95 && pos.y <= 25) {
 			// If start button is clicked, make curve
 			showCurve = !showCurve;
 			BPoints = [];
+		} else if (pos.x >= 100 && pos.y >= 5 && pos.x <= 205 && pos.y <= 25) {
+			curveAnimation(0);
 		} else {
 			let mouseOnPoint = false;
 			for (let i = 0; i < points.length; i++) {
@@ -100,13 +102,25 @@ function drawLine(x1, y1, x2, y2) {
 }
 
 
+// Sleep for a certain amount of time
+function sleep(milliseconds) {
+	const date = Date.now();
+	let currentDate = null;
+	do {
+	  currentDate = Date.now();
+	} while (currentDate - date < milliseconds);
+  }
+
+
 // Draws everything else
 function draw() {
 	// Background
 	ctx.fillStyle = '#add8e6';
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-	// Start Button Box
+	// ----- Buttons ----- //
+
+	// Toggle Button Box
 	ctx.beginPath();
 	ctx.rect(5, 5, 90, 20);
 	ctx.fillStyle = "#BF565A";
@@ -115,10 +129,26 @@ function draw() {
 	ctx.strokeStyle = 'black';
 	ctx.stroke();
 
-	// Start Button Text
+	// Toggle Button Text
 	ctx.font = '15px serif';
 	ctx.fillStyle = "white";
 	ctx.fillText('Toggle Curve', 10, 20);
+
+	// Animation Button Box
+	ctx.beginPath();
+	ctx.rect(100, 5, 105, 20);
+	ctx.fillStyle = "#BF565A";
+	ctx.fill();
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = 'black';
+	ctx.stroke();
+
+	// Animation Button Text
+	ctx.font = '15px serif';
+	ctx.fillStyle = "white";
+	ctx.fillText('Play Animation', 105, 20);
+
+
 
 	// Draws User Points
 	for (let i = 0; i < points.length; i++) {
@@ -151,8 +181,11 @@ function update() {
 
 
 // Recursive function to get bezier curve points
-function getPoint(t, sPoints) {
+function getPoint(t, sPoints, animated) {
 	let subPoints = [];
+	ctx.font = '15px serif';
+	ctx.fillStyle = "white";
+	ctx.fillText('Working', 205, 20);
 	if (sPoints.length > 1) {
 		// Finds points for all lines made with points given
 		for (let i = 0; i < sPoints.length - 1; i++) {
@@ -165,8 +198,23 @@ function getPoint(t, sPoints) {
 			subPoints.push({x: x, y: y});
 		}
 
+		// Animates it if animating
+		if (animated) {
+			for (let i = 0; i < subPoints.length - 1; i++) {
+				ctx.beginPath();
+				ctx.arc(subPoints[i].x, subPoints[i].y, 5, 0, 2 * Math.PI, false);
+				ctx.fillStyle = 'black';
+				ctx.fill();
+				ctx.lineWidth = 3;
+				ctx.strokeStyle = 'black';
+				ctx.stroke();
+				console.log("e");
+			}
+			drawPoint(subPoints[subPoints.length - 1].x, subPoints[subPoints.length - 1].y);
+		}
+
 		// passes subPoints for next points and recursion will give final point
-		return getPoint(t, subPoints);
+		return getPoint(t, subPoints, animated);
 	} else {
 
 		// This is the final point
@@ -184,9 +232,18 @@ function makeCurve() {
 	}
 	// Gets all points for t and stores in somePoints
 	for (let t = 0; t < 1; t += 0.0005) {
-		somePoints.push(getPoint(t, points))
+		somePoints.push(getPoint(t, points, false));
 	}
 	return somePoints;
+}
+
+
+function curveAnimation(t) {
+	getPoint(t, points, true);
+	console.log("t");
+	if (t < 1) {
+		setTimeout(curveAnimation, 10, t + 0.01);
+	}
 }
 
 
