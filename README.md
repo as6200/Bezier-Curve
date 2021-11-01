@@ -1,2 +1,2 @@
-# Bezier-Curve
-A program to show bezier curves.
+# unRuffled
+A website to show bezier curves.
